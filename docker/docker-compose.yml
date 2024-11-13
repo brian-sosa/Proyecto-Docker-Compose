@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    image: postgres:13
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: testdb
+    volumes:
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres-db
+
+  java-client:
+    build:
+      context: ./app
+    container_name: java-client
+    depends_on:
+      - postgres-db
+    environment:
+      DB_URL: jdbc:postgresql://postgres-db:5432/testdb
+      DB_USER: user
+      DB_PASSWORD: password
