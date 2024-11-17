@@ -5,21 +5,37 @@ import java.sql.Statement;
 
 public class ClientApp {
     public static void main(String[] args) {
-        String url = System.getenv("DB_URL");
-        String user = System.getenv("DB_USER");
-        String password = System.getenv("DB_PASSWORD");
+        // URL de conexión a PostgreSQL
+        String url = "jdbc:postgresql://database:5432/postgres";
+        String usuario = "postgres";
+        String contrasena = "password";
 
-        try (Connection conn = DriverManager.getConnection(url, user, password);
-             Statement stmt = conn.createStatement()) {
+        // Conexión a la base de datos
+        try {
+            // Cargar el driver de PostgreSQL
+            Class.forName("org.postgresql.Driver");
 
-            ResultSet rs = stmt.executeQuery("SELECT * FROM example_table");
+            // Establecer conexión
+            Connection conexion = DriverManager.getConnection(url, usuario, contrasena);
+            System.out.println("Conexión exitosa a la base de datos.");
+
+            // Crear una consulta
+            Statement stmt = conexion.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM ejemplo;");
+
+            // Mostrar resultados
             while (rs.next()) {
-                System.out.println("ID: " + rs.getInt("id") + 
-                                   ", Name: " + rs.getString("name") + 
-                                   ", Value: " + rs.getInt("value"));
+                System.out.println("ID: " + rs.getInt("id") + ", Nombre: " + rs.getString("nombre"));
             }
+
+            // Cerrar conexión
+            rs.close();
+            stmt.close();
+            conexion.close();
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("Error al conectar a la base de datos.");
         }
     }
 }
+
